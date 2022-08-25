@@ -6,13 +6,15 @@ class UserModel {
 
   UserModel({this.uid, this.email, this.firstName, this.secondName});
 
+  //creating QR
+
   //data from server
   factory UserModel.fromMap(map) {
     return UserModel(
         uid: map['uid'],
         email: map['email'],
         firstName: map['firstName'],
-        secondName: map['secondname']);
+        secondName: map['secondName']);
   }
 
   //sending data to our server
