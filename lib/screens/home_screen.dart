@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/model/user_model.dart';
 import 'package:flutter_app/screens/login_screen.dart';
 
-import '../apiscreen/apiservice.dart';
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -13,9 +11,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+// ignore: prefer_typing_uninitialized_variables
+var dateOfBirth;
+
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
+  UserModel loggedInUser = UserModel(dob: dateOfBirth);
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .doc(user!.uid)
         .get()
         .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
+      loggedInUser = UserModel.fromJson(value.data());
       setState(() {});
     });
   }
