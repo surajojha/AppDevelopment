@@ -5,13 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/user_model.dart';
 import 'package:flutter_app/screens/home_screen.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // ignore: unused_import
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-// ignore: unused_import
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -35,7 +31,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController qrTextController = TextEditingController();
   final bool autoValidate = true;
 
-  final dateOfBirthEditingController = MaskedTextController(mask: '00/00');
+  late var dateOfBirthEditingController = TextEditingController();
+  DateTime date = DateTime(2022, 09, 07);
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +89,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.account_circle),
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Second Name",
+        hintText: "Last Name",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -102,7 +99,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final dateOfBirth = TextFormField(
       autofocus: false,
       controller: dateOfBirthEditingController,
-      keyboardType: TextInputType.name,
+      keyboardType: TextInputType.number,
+
       //validator
       validator: (value) {
         if (value!.isEmpty) {
@@ -118,39 +116,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.calendar_today),
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Date of Birth",
+        hintText: "Select Date of Birth",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-    );
-
-    /*final dateOfBirth = TextFormField(
-      decoration: const InputDecoration(
-        prefixIcon: Icon(Icons.calendar_today),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Enter your date of birth",
-        labelText: 'Date of Birth',
-      ),
-      validator: ((value) {
-        if (value!.isEmpty) {
-          return ("Date of birth cannot be empty");
+      onTap: () async {
+        DateTime? pickeddate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(1980),
+            lastDate: DateTime(2101));
+        if (pickeddate != null) {
+          setState(() {
+            dateOfBirthEditingController.text =
+                DateFormat('yyyy-MM-dd').format(pickeddate);
+          });
         }
-        return null;
-
-        //demo for automatically slash after 2 digit
-      }
-      onSaved:(value) {
-        dateOfBirthEditingController.text = value!;
       },
-      textInputFieldAction: TextInputAction.next,
-      decoration: InputDecoration(
-        
-      )
-
-      ),
     );
-*/
+
     //femail field
     final emailField = TextFormField(
       autofocus: false,
@@ -285,12 +270,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       SizedBox(
-                          height: 180,
+                          height: 250,
                           child: Image.asset(
                             "assets/Allspark_Technology_site_icon-1.png",
                             fit: BoxFit.contain,
                           )),
-                      const SizedBox(height: 45),
+                      const SizedBox(height: 20),
                       firstNameField,
                       const SizedBox(height: 20),
                       secondNameField,
@@ -302,7 +287,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       passwordField,
                       const SizedBox(height: 20),
                       confirmPasswordField,
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 45),
                       signUpButton,
                     ],
                   )),
@@ -324,14 +309,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
   }
 
-  formater() {
-    var now =
-        DateTime.now(); //or u can pass the input text like _textController.text
-    var formatter = DateFormat('dd-MM-yyyy');
-    String formatted = formatter.format(now);
-    return formatted;
-  }
-
   postDetailsToFirestore() async {
     //calling  our firestore
     //calling our user model
@@ -339,7 +316,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User? user = _auth.currentUser;
 
-    UserModel userModel = UserModel(dob: dateOfBirthEditingController);
+    UserModel userModel = UserModel();
 
     //writing all the values
 
@@ -347,12 +324,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     userModel.uid = user.uid;
     userModel.firstName = firstNameEditingController.text;
     userModel.secondName = secondNameEditingController.text;
-    userModel.dob = dateOfBirthEditingController;
+    userModel.dob = dateOfBirthEditingController.text; 
 
     await firebaseFirestore
         .collection("users")
         .doc(user.uid)
-        .set(userModel.toJson());
+        .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Account created successfull");
 
     Navigator.pushAndRemoveUntil(

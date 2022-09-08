@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .doc(user!.uid)
         .get()
         .then((value) {
-      loggedInUser = UserModel.fromJson(value.data());
+      loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
   }

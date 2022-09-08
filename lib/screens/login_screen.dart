@@ -125,12 +125,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(
-                          height: 200,
+                      FittedBox(
+                          //height: 200,
                           child: Image.asset(
-                            "assets/Allspark_Technology_site_icon-1.png",
-                            fit: BoxFit.contain,
-                          )),
+                        "assets/Allspark_Technology_site_icon-1.png",
+                        fit: BoxFit.fitWidth,
+                      )),
                       const SizedBox(height: 45),
                       emailField,
                       const SizedBox(height: 25),
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 15),
                       Row(
                         children: <Widget>[
-                          const Text("Don't have an account"),
+                          const Text("Don't have an ACCOUNT ?"),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -150,11 +150,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                           const RegistrationScreen()));
                             },
                             child: const Text(
-                              "SignUp",
+                              "Sign Up",
                               style: TextStyle(
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 15),
+                                  fontSize: 20),
                             ),
                           )
                         ],
